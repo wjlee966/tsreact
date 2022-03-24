@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const User = ({ user, onRemove, onToggle }) => {
   const { username, email, id, active } = user;
+
+  useEffect(() => {
+    console.log('user 가 바뀐 후');
+    console.log(user);
+    return () => {
+      console.log('user 가 바뀌기 전');
+      console.log(user);
+    };
+  }, [user]);
 
   return (
     <div>
