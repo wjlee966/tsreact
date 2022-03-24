@@ -1,6 +1,6 @@
 // import Counter from './Counter';
 // import InputSample from './InputSample';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useReducer, useRef, useState } from 'react';
 import CreateUser from './CreateUser';
 import UserList from './UserList';
 
@@ -9,24 +9,46 @@ const countActiveUsers = users => {
   return users.filter(user => user.active).length;
 };
 
-function App() {
-  const [inputs, setInputs] = useState({
+// useReducer vs useState - 뭐 쓸까?
+// 예를 들어서 컴포넌트에서 관리하는 값이 딱 하나고,
+// 그 값이 단순한 숫자, 문자열 또는 boolean 값이라면
+// 확실히 useState 로 관리하는게 편할 것입니다.
+
+// 만약에 컴포넌트에서 관리하는 값이 여러개가 되어서
+// 상태의 구조가 복잡해진다면 useReducer로
+// 관리하는 것이 편해질 수도 있습니다.
+
+// 저의 경우에는 setter 를 한 함수에서
+// 여러번 사용해야 하는 일이 발생한다면
+// 그 때부터 useReducer 를 쓸까? 에 대한 고민을 시작합니다.
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'CHANGE_INPUT':
+      return { ...state, inputs: { ...state.inputs, [action.name]: action.value } };
+
+    case 'CREATE_USER':
+      return { inputs: initialState.inputs, users: [...state.users, action.user] };
+    // return { inputs: initialState.inputs, users: state.users.concat(action.user) };
+    case 'TOGGLE_USER':
+      return {
+        ...state,
+        users: state.users.map(user =>
+          user.id === action.id ? { ...user, active: !user.active } : user
+        ),
+      };
+    case 'REMOVE_USER':
+      return { ...state, users: state.users.filter(user => user.id !== action.id) };
+    default:
+      throw new Error(`Unhandled action: ${action.type}`);
+  }
+};
+
+const initialState = {
+  inputs: {
     username: '',
     email: '',
-  });
-
-  const nameInput = useRef();
-  const { username, email } = inputs;
-
-  const onChange = useCallback(e => {
-    const { name, value } = e.target;
-    setInputs(inputs => ({
-      ...inputs,
-      [name]: value,
-    }));
-  }, []);
-
-  const [users, setUsers] = useState([
+  },
+  users: [
     {
       id: 1,
       username: 'velopert',
@@ -45,7 +67,20 @@ function App() {
       email: 'liz@example.com',
       active: false,
     },
-  ]);
+  ],
+};
+
+function App() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const nameInput = useRef();
+  const { users } = state;
+  const { username, email } = state.inputs;
+
+  const onChange = useCallback(e => {
+    const { name, value } = e.target;
+    dispatch({ type: 'CHANGE_INPUT', name, value });
+  }, []);
 
   const nextId = useRef(4);
 
@@ -71,17 +106,8 @@ function App() {
   // 이렇게 해주면, 특정 항목을 수정하게 될 때, 해당 항목만 리렌더링 될거예요.
   // console.log 찍어보시면 CreateUser 가 렌더링이 안되고 있는 것을 확인 할 수 있습니다.
   const onCreate = useCallback(() => {
-    const user = {
-      id: nextId.current,
-      username,
-      email,
-    };
-    // setUsers([...users, user]);
-    setUsers(users => users.concat(user));
-    setInputs({
-      username: '',
-      email: '',
-    });
+    dispatch({ type: 'CREATE_USER', user: { id: nextId.current, username, email } });
+
     nameInput.current.focus();
     console.log(nextId);
     nextId.current += 1;
@@ -90,7 +116,7 @@ function App() {
   const onRemove = useCallback(id => {
     // user.id 가 파라미터로 일치하지 않는 원소만 추출해서 새로운 배열을 만듬
     // = user.id 가 id 인 것을 제거함
-    setUsers(users => users.filter(user => user.id !== id));
+    dispatch({ type: 'REMOVE_USER', id });
   }, []);
 
   // 이 함수들은 컴포넌트가 리렌더링 될 때 마다 새로 만들어집니다.
@@ -116,16 +142,7 @@ function App() {
   //   [users]
   // );
   const onToggle = useCallback(id => {
-    setUsers(users =>
-      users.map(user =>
-        user.id === id
-          ? {
-              ...user,
-              active: !user.active,
-            }
-          : user
-      )
-    );
+    dispatch({ type: 'TOGGLE_USER', id });
   }, []);
 
   // useMemo 의 첫번째 파라미터에는 어떻게 연산할지 정의하는 함수를 넣어주면 되고
