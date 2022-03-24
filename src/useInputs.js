@@ -1,15 +1,27 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useReducer } from 'react';
+
+// EXERCISE #1. useState 대신 useReducer 로 구현할 것!
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'CHANGE_INPUT':
+      return { ...state, [action.name]: [action.value] };
+    case 'RESET':
+      return action.initialForm;
+    default:
+      throw new Error(`Unhandled action: ${action.type}`);
+  }
+};
 
 const useInputs = initialForm => {
-  const [form, setForm] = useState(initialForm);
+  const [state, dispatch] = useReducer(reducer, initialForm);
   const onChange = useCallback(e => {
     const { name, value } = e.target;
-    setForm(form => ({ ...form, [name]: value }));
+    dispatch({ type: 'CHANGE_INPUT', name, value });
   }, []);
 
-  const reset = useCallback(() => setForm(initialForm), [initialForm]);
+  const reset = useCallback(() => dispatch({ type: 'RESET', initialForm }), [initialForm]);
 
-  return [form, onChange, reset];
+  return [state, onChange, reset];
 };
 
 export default useInputs;
