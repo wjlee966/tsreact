@@ -2,6 +2,7 @@
 // import InputSample from './InputSample';
 import { useCallback, useMemo, useReducer, useRef, useState } from 'react';
 import CreateUser from './CreateUser';
+import useInputs from './useInputs';
 import UserList from './UserList';
 
 const countActiveUsers = users => {
@@ -23,31 +24,23 @@ const countActiveUsers = users => {
 // 그 때부터 useReducer 를 쓸까? 에 대한 고민을 시작합니다.
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'CHANGE_INPUT':
-      return { ...state, inputs: { ...state.inputs, [action.name]: action.value } };
-
     case 'CREATE_USER':
-      return { inputs: initialState.inputs, users: [...state.users, action.user] };
-    // return { inputs: initialState.inputs, users: state.users.concat(action.user) };
+      return { users: [...state.users, action.user] };
+    // return { users: state.users.concat(action.user) };
     case 'TOGGLE_USER':
       return {
-        ...state,
         users: state.users.map(user =>
           user.id === action.id ? { ...user, active: !user.active } : user
         ),
       };
     case 'REMOVE_USER':
-      return { ...state, users: state.users.filter(user => user.id !== action.id) };
+      return { users: state.users.filter(user => user.id !== action.id) };
     default:
       throw new Error(`Unhandled action: ${action.type}`);
   }
 };
 
 const initialState = {
-  inputs: {
-    username: '',
-    email: '',
-  },
   users: [
     {
       id: 1,
@@ -72,15 +65,10 @@ const initialState = {
 
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
-
+  const [form, onChange, reset] = useInputs({ username: '', email: '' });
   const nameInput = useRef();
   const { users } = state;
-  const { username, email } = state.inputs;
-
-  const onChange = useCallback(e => {
-    const { name, value } = e.target;
-    dispatch({ type: 'CHANGE_INPUT', name, value });
-  }, []);
+  const { username, email } = form;
 
   const nextId = useRef(4);
 
@@ -111,7 +99,8 @@ function App() {
     nameInput.current.focus();
     console.log(nextId);
     nextId.current += 1;
-  }, [email, username]);
+    reset();
+  }, [email, reset, username]);
 
   const onRemove = useCallback(id => {
     // user.id 가 파라미터로 일치하지 않는 원소만 추출해서 새로운 배열을 만듬
