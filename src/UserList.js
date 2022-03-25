@@ -1,7 +1,13 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
+import { UserDispatch } from './App';
 
-const User = React.memo(({ user, onRemove, onToggle }) => {
+const User = React.memo(({ user }) => {
   const { username, email, id, active } = user;
+
+  // User 컴포넌트에서 바로 dispatch 를 활용하기 위해,
+  // useContext 라는 Hook 을 사용해서
+  // 우리가 만든 UserDispatch Context 를 조회해야합니다.
+  const dispatch = useContext(UserDispatch);
 
   useEffect(() => {
     console.log('user 가 바뀐 후');
@@ -19,21 +25,21 @@ const User = React.memo(({ user, onRemove, onToggle }) => {
           color: active ? 'green' : 'black',
           cursor: 'pointer',
         }}
-        onClick={() => onToggle(id)}
+        onClick={() => dispatch({ type: 'TOGGLE_USER', id })}
       >
         {username}
       </b>{' '}
       <span>({email})</span>
-      <button onClick={() => onRemove(id)}>삭제</button>
+      <button onClick={() => dispatch({ type: 'REMOVE_USER', id })}>삭제</button>
     </div>
   );
 });
 
-const UserList = ({ users, onRemove, onToggle }) => {
+const UserList = ({ users }) => {
   return (
     <div>
       {users.map(user => (
-        <User key={user.id} user={user} onRemove={onRemove} onToggle={onToggle} />
+        <User key={user.id} user={user} />
       ))}
     </div>
   );
