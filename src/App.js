@@ -63,6 +63,9 @@ const initialState = {
   ],
 };
 
+// UserState 라는 이름으로 내보내줍니다.
+export const UserState = createContext(null);
+
 // UserDispatch 라는 이름으로 내보내줍니다.
 export const UserDispatch = createContext(null);
 
@@ -112,17 +115,19 @@ function App() {
   const count = useMemo(() => countActiveUsers(users), [users]);
 
   return (
-    <UserDispatch.Provider value={dispatch}>
-      <CreateUser
-        username={username}
-        email={email}
-        onChange={onChange}
-        onCreate={onCreate}
-        nameInput={nameInput}
-      />
-      <UserList users={users} />
-      <div>{`활성 사용자 수 : ${count}`}</div>
-    </UserDispatch.Provider>
+    <UserState.Provider value={state}>
+      <UserDispatch.Provider value={dispatch}>
+        <CreateUser
+          username={username}
+          email={email}
+          onChange={onChange}
+          onCreate={onCreate}
+          nameInput={nameInput}
+        />
+        <UserList />
+        <div>{`활성 사용자 수 : ${count}`}</div>
+      </UserDispatch.Provider>
+    </UserState.Provider>
   );
 }
 
