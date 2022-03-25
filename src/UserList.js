@@ -35,13 +35,7 @@ const User = React.memo(({ user }) => {
   );
 });
 
-const UserList = () => {
-  // UserList 는 App 컴포넌트의 자식 컴포넌트이기 때문에
-  // users 를 props 로 내려받는 것이 오히려 효율적임
-  // (벌써, hook 만 몇 개를 쓴건지...)
-  const state = useContext(UserState);
-  const { users } = state;
-
+const UserList = ({ users }) => {
   return (
     <div>
       {users.map(user => (
