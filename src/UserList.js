@@ -1,13 +1,10 @@
-import React, { useContext, useEffect } from 'react';
-import { UserDispatch, UserState } from './App';
+import React, { useEffect } from 'react';
+import { useInputDispatch, useInputState } from './InputContext';
 
 const User = React.memo(({ user }) => {
   const { username, email, id, active } = user;
 
-  // User 컴포넌트에서 바로 dispatch 를 활용하기 위해,
-  // useContext 라는 Hook 을 사용해서
-  // 우리가 만든 UserDispatch Context 를 조회해야합니다.
-  const dispatch = useContext(UserDispatch);
+  const dispatch = useInputDispatch();
 
   useEffect(() => {
     console.log('user 가 바뀐 후');
@@ -35,7 +32,10 @@ const User = React.memo(({ user }) => {
   );
 });
 
-const UserList = ({ users }) => {
+const UserList = () => {
+  const state = useInputState();
+  const { users } = state;
+
   return (
     <div>
       {users.map(user => (
