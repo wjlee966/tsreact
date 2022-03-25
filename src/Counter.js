@@ -1,27 +1,16 @@
-import React, { useReducer } from 'react';
-
-const reducer = (state, action) => {
-  // 새로운 상태를 만드는 로직
-  // const nextState = ...
-  switch (action.type) {
-    case 'INCREASE':
-      return state + 1;
-    case 'DECREASE':
-      return state - 1;
-    default:
-      throw new Error(`Unhandled action: ${action.type}`);
-  }
-};
+import React from 'react';
+import { useCounterDispatch, useCounterState } from './CounterContext';
 
 const Counter = () => {
-  const [number, dispatch] = useReducer(reducer, 0);
+  const state = useCounterState();
+  const dispatch = useCounterDispatch();
 
   const onIncrease = () => dispatch({ type: 'INCREASE' });
   const onDecrease = () => dispatch({ type: 'DECREASE' });
 
   return (
     <div>
-      <h1>{number}</h1>
+      <h1>{state.count}</h1>
       <button onClick={onIncrease}>+1</button>
       <button onClick={onDecrease}>-1</button>
     </div>
