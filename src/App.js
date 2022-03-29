@@ -1,6 +1,7 @@
 import { Route, Link } from 'react-router-dom';
 import About from './About';
 import Home from './Home';
+import Profile from './Profile';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
       {/* <Route path="주소규칙" component={보여주고싶은 컴포넌트}> */}
       <Route path='/' component={Home} exact />
       <Route path='/about' component={About} />
+      <Route path='/profile/:username' component={Profile} />
     </div>
   );
 }
