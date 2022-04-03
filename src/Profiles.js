@@ -1,4 +1,4 @@
-import { Route, Link } from 'react-router-dom';
+import { Route, NavLink } from 'react-router-dom';
 import Profile from './Profile';
 import WithRouterSample from './WithRouterSample';
 
@@ -8,10 +8,17 @@ const Profiles = () => {
       <h3>사용자 목록</h3>
       <ul>
         <li>
-          <Link to='/profiles/velopert'>velopert</Link>
+          {/* NavLink 는 Link 랑 비슷한데, 만약 현재 경로와 Link 에서
+              사용하는 경로가 일치하는 경우 특정 스타일 혹은 클래스를
+              적용 할 수 있는 컴포넌트입니다. */}
+          <NavLink to='/profiles/velopert' activeStyle={{ background: 'black', color: 'white' }}>
+            velopert
+          </NavLink>
         </li>
         <li>
-          <Link to='/profiles/homer'>homer</Link>
+          <NavLink to='/profiles/homer' activeStyle={{ background: 'black', color: 'white' }}>
+            homer
+          </NavLink>
         </li>
       </ul>
 
