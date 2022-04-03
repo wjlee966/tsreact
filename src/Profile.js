@@ -1,4 +1,4 @@
-import React from 'react';
+import WithRouterSample from './WithRouterSample';
 
 // 프로필에서 사용 할 데이터
 const profileData = {
@@ -28,6 +28,7 @@ const Profile = ({ match }) => {
         {username} ({profile.name})
       </h3>
       <p>{profile.description}</p>
+      <WithRouterSample />
     </div>
   );
 };

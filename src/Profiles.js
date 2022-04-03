@@ -1,5 +1,6 @@
 import { Route, Link } from 'react-router-dom';
 import Profile from './Profile';
+import WithRouterSample from './WithRouterSample';
 
 const Profiles = () => {
   return (
@@ -21,6 +22,7 @@ const Profiles = () => {
           단순히 state 로 관리하는 것 보다 서브 라우트로 관리를 하는 것을 권장드립니다. */}
       <Route path='/profiles' exact render={() => <div>사용자를 선택해주세요!</div>} />
       <Route path='/profiles/:username' component={Profile} />
+      {/* <WithRouterSample /> */}
     </div>
   );
 };
