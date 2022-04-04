@@ -3,11 +3,19 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import './exercise';
+import { createStore } from 'redux';
+import rootReducer from './modules';
+import { Provider } from 'react-redux';
+// import './exercise';
+
+const store = createStore(rootReducer); // 스토어를 만듭니다.
+console.log(store.getState()); // 스토어의 상태를 확인합니다.
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
