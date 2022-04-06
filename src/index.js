@@ -6,11 +6,16 @@ import reportWebVitals from './reportWebVitals'; // 리덕스 개발자 도구
 import { Provider } from 'react-redux';
 import { applyMiddleware, createStore } from 'redux';
 import rootReducer from './modules';
+import ReduxThunk from 'redux-thunk';
 // import myLogger from './middlewares/myLogger';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import logger from 'redux-logger';
 
-const store = createStore(rootReducer, composeWithDevTools(applyMiddleware(logger))); // 여러개의 미들웨어를 적용 할 수 있습니다.
+const store = createStore(
+  rootReducer,
+  // logger 를 사용하는 경우, logger가 가장 마지막에 와야합니다
+  composeWithDevTools(applyMiddleware(ReduxThunk, logger))
+); // 여러개의 미들웨어를 적용 할 수 있습니다.
 
 ReactDOM.render(
   <React.StrictMode>
