@@ -34,13 +34,19 @@ export const reducerUtils = {
 
 // 비동기 관련 액션들을 처리하는 리듀서를 만들어줍니다.
 // type 은 액션의 타입, key 는 상태의 key (예: posts, post) 입니다.
-export const handleAsyncActions = (type, key) => {
+
+// 포스트 목록 재로딩 이슈 #2
+// 로딩을 새로하긴 하는데, 로딩중... 을 띄우지 않는 것입니다. (keepData)
+// 두번째 방법의 장점은 사용자에게 좋은 경험을 제공하면서도
+// 뒤로가기를 통해 다시 포스트 목록을 조회 할 때
+// 최신 데이터를 보여줄 수 있다는 것 입니다.
+export const handleAsyncActions = (type, key, keepData = false) => {
   const [SUCCESS, ERROR] = [`${type}_SUCCESS`, `${type}_ERROR`];
 
   return (state, action) => {
     switch (action.type) {
       case type:
-        return { ...state, [key]: reducerUtils.loading() };
+        return { ...state, [key]: reducerUtils.loading(keepData ? state[key].data : null) };
       case SUCCESS:
         return { ...state, [key]: reducerUtils.success(action.payload) };
       case ERROR:
