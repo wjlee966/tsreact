@@ -68,6 +68,11 @@ export const getPosts = createPromiseThunk(GET_POSTS, postsAPI.getPosts);
 //   }
 // };
 export const getPost = createPromiseThunkById(GET_POST, postsAPI.getPostById);
+export const goToHome =
+  () =>
+  (dispatch, getState, { history }) => {
+    history.push('/');
+  };
 
 // 특정 포스트 조회시 재로딩 이슈 #1
 export const clearPost = () => ({ type: CLEAR_POST });
