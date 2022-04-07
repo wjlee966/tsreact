@@ -5,7 +5,7 @@
 // 1. 프로미스가 시작, 성공, 실패했을때 다른 액션을 디스패치해야합니다.
 // 2. 각 프로미스마다 thunk 함수를 만들어 주어야 합니다.
 // 3. 리듀서에서 액션에 따라 로딩중, 결과, 에러 상태를 변경해 주어야 합니다.
-import { getContext, takeEvery } from 'redux-saga/effects';
+import { getContext, select, takeEvery } from 'redux-saga/effects';
 import * as postsAPI from '../api/posts'; // api/posts 안의 함수 모두 불러오기
 import {
   createPromiseSaga,
@@ -31,6 +31,7 @@ const GO_TO_HOME = 'posts/GO_TO_HOME';
 // 특정 포스트 조회시 재로딩 이슈 #1
 // 포스트 비우기
 const CLEAR_POST = 'posts/CLEAR_POST';
+const PRINT_STATE = 'posts/PRINT_STATE';
 
 // 리팩토링 #1:createPromiseThunk
 // thunk를 사용할 때 꼭 모든 액션들에 대하여 액션 생성 함수를 만들 필요는 없습니다.
@@ -103,6 +104,7 @@ export function* postSaga() {
   yield takeEvery(GET_POSTS, getPostsSaga);
   yield takeEvery(GET_POST, getPostSaga);
   yield takeEvery(GO_TO_HOME, goToHomeSaga);
+  yield takeEvery(PRINT_STATE, printStateSaga);
 }
 
 // export const goToHome =
@@ -114,12 +116,17 @@ function* goToHomeSaga() {
   const history = yield getContext('history');
   history.push('/');
 }
+function* printStateSaga() {
+  const state = yield select(state => state.posts);
+  console.log(state);
+}
 
 // 3번째 인자를 사용하면 withExtraArgument 에서 넣어준 값들을 사용할 수 있습니다.
 export const goToHome = () => ({ type: GO_TO_HOME });
 
 // 특정 포스트 조회시 재로딩 이슈 #1
 export const clearPost = () => ({ type: CLEAR_POST });
+export const printState = () => ({ type: PRINT_STATE });
 
 // 리팩토링 #0:reducerUtils
 // const initialState = {
