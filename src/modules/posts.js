@@ -5,9 +5,15 @@
 // 1. 프로미스가 시작, 성공, 실패했을때 다른 액션을 디스패치해야합니다.
 // 2. 각 프로미스마다 thunk 함수를 만들어 주어야 합니다.
 // 3. 리듀서에서 액션에 따라 로딩중, 결과, 에러 상태를 변경해 주어야 합니다.
-import { call, put, takeEvery } from 'redux-saga/effects';
+import { takeEvery } from 'redux-saga/effects';
 import * as postsAPI from '../api/posts'; // api/posts 안의 함수 모두 불러오기
-import { handleAsyncActions, handleAsyncActionsById, reducerUtils } from '../lib/asyncUtils';
+import {
+  createPromiseSaga,
+  createPromiseSagaById,
+  handleAsyncActions,
+  handleAsyncActionsById,
+  reducerUtils,
+} from '../lib/asyncUtils';
 
 /* 액션 타입 */
 
@@ -69,25 +75,27 @@ export const getPosts = () => ({ type: GET_POSTS });
 // payload는 파라미터 용도, meta는 리듀서에서 id를 알기 위한 용도
 export const getPost = id => ({ type: GET_POST, payload: id, meta: id });
 
-function* getPostsSaga() {
-  try {
-    const posts = yield call(postsAPI.getPosts); // call을 사용하면 특정 함수를 호출하고 결과물이 반환될 때까지 기다려 줄 수 있습니다.
-    yield put({ type: GET_POSTS_SUCCESS, payload: posts }); // 성공 액션 디스패치
-  } catch (e) {
-    yield put({ type: GET_POSTS_ERROR, payload: e, error: true }); // 실패 액션 디스패치
-  }
-}
+// function* getPostsSaga() {
+//   try {
+//     const posts = yield call(postsAPI.getPosts); // call을 사용하면 특정 함수를 호출하고 결과물이 반환될 때까지 기다려 줄 수 있습니다.
+//     yield put({ type: GET_POSTS_SUCCESS, payload: posts }); // 성공 액션 디스패치
+//   } catch (e) {
+//     yield put({ type: GET_POSTS_ERROR, payload: e, error: true }); // 실패 액션 디스패치
+//   }
+// }
+const getPostsSaga = createPromiseSaga(GET_POSTS, postsAPI.getPosts);
 
 // 액션이 지니고 있는 값을 조회하고 싶다면 action을 파라미터로 받아와서 사용할 수 있습니다.
-function* getPostSaga(action) {
-  const id = action.payload;
-  try {
-    const post = yield call(postsAPI.getPostById, id); // API 함수에 넣어주고 싶은 인자는 call 함수의 두번째 인자부터 순서대로 넣어주면 됩니다.
-    yield put({ type: GET_POST_SUCCESS, payload: post, meta: id });
-  } catch (e) {
-    yield put({ type: GET_POST_ERROR, payload: e, error: true, meta: id });
-  }
-}
+// function* getPostSaga(action) {
+//   const id = action.payload;
+//   try {
+//     const post = yield call(postsAPI.getPostById, id); // API 함수에 넣어주고 싶은 인자는 call 함수의 두번째 인자부터 순서대로 넣어주면 됩니다.
+//     yield put({ type: GET_POST_SUCCESS, payload: post, meta: id });
+//   } catch (e) {
+//     yield put({ type: GET_POST_ERROR, payload: e, error: true, meta: id });
+//   }
+// }
+const getPostSaga = createPromiseSagaById(GET_POST, postsAPI.getPostById);
 
 // 사가들을 합치기
 export function* postSaga() {
